@@ -20,10 +20,13 @@
 
 int main() {
   DIR * d;
-  d = opendir("testing");
+  d = opendir("test");
   struct dirent *entry;
-  entry = readdir (d);
-  closedir(d);
+  entry = readdir(d);
+  
+  readdir(d);
+  printf("%s", entry->d_name);
 
+  closedir(d);
   return 0;
 }
