@@ -1,0 +1,36 @@
+/* With your *new* table buddy, write a program that will gather various information about a directory, specifically: */
+/* list all the files in the directory */
+/* specify which files are directories (if any) */
+/* show the total size of all the regular files the directory */
+/* note that you do not have to recursively go through any subdirectories to find their size for this part (unless you want to, but that is not a simple task) */
+/* Have the program scan the current directory */
+/* Possible enhancements: */
+/* Recursively list the files in any subdirectories, update the total to include the total size of subdirectories */
+/* Print out the size in a more readable format (like using KB, MB, GB for -byte prefixes) */
+
+#include<stdlib.h>
+#include<time.h>
+#include<stdio.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<string.h>
+int myrand() {
+  int randomData = open("/dev/urandom", O_RDONLY);
+  int number;
+  int result = read(randomData, number, sizeof number);
+  return number;
+}
+
+
+int main() {
+  int randomData = open("/dev/urandom", O_RDONLY);
+  int myRandomData[10];
+  int result = read(randomData, myRandomData, sizeof myRandomData);
+  int i = 0;
+  for(i; i< 10; i++) {
+    printf("%d,", myRandomData[i]);
+  }
+  
+  return 0;
+}
