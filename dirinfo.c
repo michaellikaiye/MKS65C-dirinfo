@@ -1,5 +1,3 @@
-
-/* list all the files in the directory */
 /* specify which files are directories (if any) */
 /* show the total size of all the regular files the directory */
 /* note that you do not have to recursively go through any subdirectories to find their size for this part (unless you want to, but that is not a simple task) */
@@ -18,14 +16,29 @@
 #include<dirent.h>
 #include<sys/types.h>
 
+
+
 int main() {
   DIR * d;
-  d = opendir("test");
-  struct dirent *entry;
-  entry = readdir(d);
+  d = opendir(".");
+
+  if (d == NULL){ 
+    printf("Could not open current directory" ); 
+    return 0; 
+  } 
   
-  readdir(d);
-  printf("%s", entry->d_name);
+  struct dirent *entry;
+  
+  int fsize = 0;
+  while(entry = readdir(d)){
+    printf("%s: %d\n", entry->d_name, entry->d_type);
+    if (entry->d_type == 8){
+      struct stat * pter;
+      stat(entry->d_name, pter);
+      fsize += pter->st_size;
+    }
+  }
+  printf("fsize: %d\n",fsize);
 
   closedir(d);
   return 0;
