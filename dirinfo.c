@@ -34,14 +34,14 @@ void printPermissions(int fileMode) {
   printHelper(fileMode, S_IXOTH, S_IEXEC, 'x');
 }
 
-void printSize(long int size) {
+void printSize(double size) {
   char * sizearray[5] = {"", "K", "M", "G", "T"};
   int ps = 0;
   while(size > 1000) {
-    size = size / 1000;
+    size = size / 1000.0;
     ps++;
   }
-  printf("%ld %sB", size, sizearray[ps]);
+  printf("%f %sB", size, sizearray[ps]);
 }
 
 
