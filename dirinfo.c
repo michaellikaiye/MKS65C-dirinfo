@@ -123,8 +123,9 @@ long int printDir(char *str) {
 
       // prints directory name
       printf("  %s\n", entry->d_name);   
-      
-      //printDir(entry->d_name, tab + 3);
+
+      //BROKEN
+      //printDir(entry->d_name);
     }
 
     else if (entry->d_type == 8){
