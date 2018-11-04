@@ -11,6 +11,7 @@
 #include<string.h>
 #include<dirent.h>
 #include<sys/types.h>
+#include<pwd.h>
 void printHelper(int fileMode, int b, int c, char p) {
   if ((fileMode & b) && (fileMode & c))
     printf("%c",p);
@@ -58,7 +59,13 @@ void printStat(char * str) {
   printPermissions(pter -> st_mode);
   printf("  ");
 
-
+  //print user id and group id of owner
+  struct passwd * pwd =  malloc(sizeof(struct passwd));
+  pwd = getpwuid(pter->st_uid);
+  printf("  %s  ", pwd->pw_name);
+  pwd = getpwuid(pter->st_gid);
+  printf("  %s  ", pwd->pw_name);
+  
   //prints time of last access
   char temp[100];
   strftime(temp, 100, "%c", localtime(&(pter -> st_atime)));
@@ -106,6 +113,9 @@ long int printDir(char *str) {
       printPermissions(po->st_mode);
       printf("  ");
 
+
+      // USER, GROUP, AND TIME ARE NOT AVAILABLE
+      printf(" USERID   GROUPID  ");
       printf(" day mon dd hh:mm:ss yyyy  ");
 
       // prints directory size
@@ -119,24 +129,6 @@ long int printDir(char *str) {
 
     else if (entry->d_type == 8){
       stat(entry->d_name, po);
-
-      /*
-      // prints file name
-      printf("%sFile name: %s\n", tabString, entry->d_name);
-      printf("%s  ", tabString);
-      
-      // prints file permissions
-      // ==============ERROR HERE: ST_MODE RETURNS 0=============
-      printf("File permissions: ");
-      printPermissions(po->st_mode);
-      printf("\n %s  ", tabString);
-
-      // prints file size
-      printf("file size: ");
-      printSize(po->st_size);
-      printf("\n\n");
-      
-      */
 
       printStat(entry->d_name);
 
