@@ -98,6 +98,7 @@ long int printDir(char *str) {
   d = opendir(directory);
   if (d == NULL) {
     printf("1ERROR: %s\n", strerror(errno));
+    printf("Please re-run the program and enter a valid directory name\n");
     return errno;
   }
   int speNum = 0;
@@ -199,11 +200,10 @@ long int printDir(char *str) {
 
 
 
-int main() {
+int main(int argc, char * argv[]) {
   printf("DIRINFO\nplease enter directory name, click enter, then enter whatever\n");
-  char * x;
-  double d;
-  scanf("%s %lf", x, &d);
+  char * x = malloc(sizeof(char));
+  scanf("%s", x);
   printDir(x);
   return 0;
   }
