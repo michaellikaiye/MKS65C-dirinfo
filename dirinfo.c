@@ -129,6 +129,8 @@ long int printDir(char *str) {
   int fA = 0;
   // prints directory information
   while(entry = readdir(d)) {
+    struct stat * po = malloc(sizeof(struct stat));
+    stat(entry->d_name, po);
     if (entry->d_type == 4) {
       if(strncmp(entry->d_name, ".", 1) != 0) {
 	dirArray[dA] = entry->d_name;
@@ -140,13 +142,12 @@ long int printDir(char *str) {
       }
     }
 
-    struct stat * po = malloc(sizeof(struct stat));
-    stat(entry->d_name, po);
     if (entry->d_type == 8) {
       filArray[fA] = entry->d_name;
       fA++;
-      fsize += po->st_size;
     }
+    fsize += po->st_size;
+    
     free(po);
   }
   printf("total size: ");
@@ -189,7 +190,6 @@ long int printDir(char *str) {
   
   for(h = 0; h < dA; h++) {
     ename = (void *) dirArray[h];
-    printf("\n%s",ename);
     printDir(ename);
   }
   // prints total directory size
