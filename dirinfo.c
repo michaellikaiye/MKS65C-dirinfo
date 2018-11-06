@@ -1,7 +1,3 @@
-
-/* Recursively list the files in any subdirectories, update the total to include the total size of subdirectories */
-/* Print out the size in a more readable format (like using KB, MB, GB for -byte prefixes) */
-
 #include<stdlib.h>
 #include<time.h>
 #include<stdio.h>
@@ -12,6 +8,7 @@
 #include<dirent.h>
 #include<sys/types.h>
 #include<pwd.h>
+#include<errno.h>
 void printHelper(int fileMode, int b, int c, char p) {
   if ((fileMode & b) && (fileMode & c))
     printf("%c",p);
@@ -97,76 +94,103 @@ long int printDir(char *str) {
   struct dirent *entry;
   long int fsize = 0;
   DIR * d;
-  d = opendir(str);
+  const char * directory = str;
+  d = opendir(directory);
   if (d == NULL) {
-    printf("Could not open current directory 1\n");
-    return 0;
+    printf("1ERROR: %s\n", strerror(errno));
+    return errno;
   }
+  int speNum = 0;
   int dirNum = 0;
   int filNum = 0;
-  while(entry = readdir(d)){
-    if (entry->d_type == 4 && strncmp(entry->d_name, ".", 1) != 0)
-      dirNum++;
+  while(entry = readdir(d)) {
+    if (entry->d_type == 4) {
+      if(strncmp(entry->d_name, ".", 1) != 0)
+	dirNum++;
+      else
+	speNum++;
+    }
     if (entry->d_type == 8)
       filNum++;
   }
-  printf("directories: %d\n", dirNum);
-  printf("files: %d\n",filNum);
   closedir(d);
 
   d = opendir(str);
   //error stuff?? how to implement
   if (d == NULL){
-    printf("Could not open current directory 2\n");
-    return 0;
+    printf("2ERROR: %s\n", strerror(errno));
+    return errno;
   }
-
-  char *dirArray[dirNum];
+  const char *speArray[speNum];
+  int sA = 0;
+  const char *dirArray[dirNum];
   int dA = 0;
+  const char *filArray[filNum];
+  int fA = 0;
   // prints directory information
-  while(entry = readdir(d)){
-
-    // allocate some memory for file information
-    struct stat * po = malloc(sizeof(struct stat));
-    stat(entry->d_name, po);
-
-    // prints information in the current directory but prevents recursively printing the directory itself
+  while(entry = readdir(d)) {
     if (entry->d_type == 4) {
-      printf("\033[0;34m");
-      printf("d");
-      printStat(entry->d_name);
-      printf("\033[0m");
       if(strncmp(entry->d_name, ".", 1) != 0) {
-        dirArray[dA] = entry->d_name;
+	dirArray[dA] = entry->d_name;
         dA++;
       }
-      //BROKEN
-      //printDir(entry->d_name);
+      else {
+	speArray[sA] = entry->d_name;
+        sA++;
+      }
     }
 
-    else if (entry->d_type == 8){
-      printf("-");
-      stat(entry->d_name, po);
-      printStat(entry->d_name);
-      // updates total size
+    struct stat * po = malloc(sizeof(struct stat));
+    stat(entry->d_name, po);
+    if (entry->d_type == 8) {
+      filArray[fA] = entry->d_name;
+      fA++;
       fsize += po->st_size;
     }
-    else;
-    //frees memory
     free(po);
   }
   printf("total size: ");
   printSize(fsize);
   printf("\n");
 
+  // sorts directories and files
+  int h;
+  char * ename;
+  printf("dir weird ones: %d\n", speNum);
+  sort(speArray, sA);
+  for(h = 0; h < sA; h++) {
+    ename = (void *) speArray[h];
+    printf("\033[0;34m");
+    printf("d");
+    printStat(ename);
+    printf("\033[0m");
+  }
+
+  printf("directories: %d\n", dirNum);
+  sort(dirArray, dA);
+  for(h = 0; h < dA; h++) {
+    ename = (void *) dirArray[h];
+    printf("\033[0;34m");
+    printf("d");
+    printStat(ename);
+    printf("\033[0m");
+    //printDir(dirArray[h]);
+  }
+
+  printf("files: %d\n",filNum);
+  sort(filArray, fA);
+  for(h = 0; h < fA; h++) {
+    ename = (void *) filArray[h];
+    printf("-");
+    printStat(ename);
+  }
   // closes directory
   closedir(d);
-
-  //print other subdirectories
-  //sort(dirArray, dA);
-  int h;
+  
   for(h = 0; h < dA; h++) {
-    printDir(dirArray[h]);
+    ename = (void *) dirArray[h];
+    printf("\n%s",ename);
+    printDir(ename);
   }
   // prints total directory size
 
@@ -176,8 +200,10 @@ long int printDir(char *str) {
 
 
 int main() {
-  printf("directory information (note that . files are ignored when printing subdirectories)\n\n");
-  printDir(".");
-
+  printf("DIRINFO\nplease enter directory name, click enter, then enter whatever\n");
+  char * x;
+  double d;
+  scanf("%s %lf", x, &d);
+  printDir(x);
   return 0;
   }
